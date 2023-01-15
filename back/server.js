@@ -5,7 +5,7 @@ const port = 3000;
 
 // Database connection
 const sqlite3 = require('sqlite3');
-const db = new sqlite3.Database('./database.db');
+const db = new sqlite3.Database(__dirname + '/database.db');
 
 // Get all prices from last 24 hours
 app.get('/prices', (req, res) => {
