@@ -7,6 +7,12 @@ const port = 3000;
 const sqlite3 = require('sqlite3');
 const db = new sqlite3.Database(__dirname + '/database.db');
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 // Get all prices from last 24 hours
 app.get('/prices', (req, res) => {
     db.all(`SELECT * FROM prices WHERE date >= date('now', '-1 days')`, (err, rows) => {
@@ -19,7 +25,7 @@ app.get('/prices', (req, res) => {
 // Get all prices from last 24 hours for a specific pair
 app.get('/prices/:asset1-:asset2', (req, res) => {
     const pair = req.params.asset1 + '-' + req.params.asset2;
-    db.all(`SELECT * FROM prices WHERE date >= date('now', '-1 days') AND peer == '` + pair + `'`, (err, rows) => {
+    db.all(`SELECT * FROM prices WHERE date >= date('now', '-1 days') AND pair == '` + pair + `'`, (err, rows) => {
         if (err) throw err;
         // Return the web pages result
         res.json({ prices: rows });
@@ -29,7 +35,7 @@ app.get('/prices/:asset1-:asset2', (req, res) => {
 // Get average price for a specific pair into the last 24 hours
 app.get('/average/:asset1-:asset2', (req, res) => {
     const pair = req.params.asset1 + '-' + req.params.asset2;
-    db.all(`SELECT AVG(price) as average_price FROM prices WHERE date >= date('now', '-1 days') AND peer == '` + pair + `'`, (err, rows) => {
+    db.all(`SELECT AVG(price) as average_price FROM prices WHERE date >= date('now', '-1 days') AND pair == '` + pair + `'`, (err, rows) => {
         if (err) throw err;
         // Return the web pages result
         res.json(rows.at(0));
